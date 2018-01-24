@@ -4,8 +4,7 @@
  * a simple "caching" layer so it will reuse cached images if you attempt
  * to load the same image multiple times.
  */
-
-class Resource {
+ class Resource {
     constructor() {
         this.resourceCache = {};
         this.loading = [];
@@ -21,6 +20,7 @@ class Resource {
             urlOrArr.forEach((url) => {
                 this._load(url);
             });
+
         } else {
             /* The developer did not pass an array to this function,
              * assume the value is a string and call our image loader
@@ -61,7 +61,7 @@ class Resource {
              * the image's onload event handler is called. Finally, point
              * the image's src attribute to the passed in URL.
              */
-            this.resourceCache[url] = false;
+            this.resourceCache[url] = img;
             img.src = url;
         }
     }
@@ -89,7 +89,9 @@ class Resource {
     }
 
 }
-let Resources = new Resource();
 
-const imgWidth = 101,
-      imgHeight = 171;
+module.exports = {
+    Resources: new Resource()
+};
+
+

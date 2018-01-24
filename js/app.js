@@ -1,13 +1,18 @@
+import {Resources} from './resources';
+
+export  const canvasWidth = 505;
+export  const canvasHeight = 600;
+export  const imgWidth = 101;
+export  const imgHeight = 171;
 
 // The Enemy who will be avoided
-const canvasWidth = 505;
-const canvasHeight = 600;
-class Enemy {
+export class Enemy {
     constructor(y) {
         this.x = -imgWidth;
         this.y = y ;
         this.sprite = 'images/enemy-bug.png';
         this.speed = Math.floor(Math.random()*3)+1;
+        this.ctx = document.getElementById('my-canvas').getContext('2d');
     }
 
     update() {
@@ -17,24 +22,25 @@ class Enemy {
     }
 
     render() {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+        this.ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 
     }
 }
 
-class Player {
+export class Player {
     constructor(sprite= 'images/char-boy.png') {
         this.sprite= sprite;
-        this.x = canvasWidth / 2 - imgWidth/2 ;
-        this.y = canvasHeight - imgHeight +20;
+        this.x = canvasWidth / 2 - imgWidth/2;
+        this.y =canvasHeight - imgHeight +20;
+        this.ctx = document.getElementById('my-canvas').getContext('2d')
     }
     render() {
-        ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+        this.ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
     }
     update() {
 
     }
-    handleInput(input) {
+    handleInput(input, arcade) {
 
         switch (input) {
             case 'up':
@@ -52,7 +58,7 @@ class Player {
                         dialog.children[1].addEventListener('click', (ev)=> {
 
                             dialog.classList.remove('dialog-scale');
-                            init();
+                            arcade.init();
                         })
                         })(true)
                 }
@@ -84,18 +90,5 @@ class Player {
     }
 }
 
-const allEnemies = Array.from({length: 4}, (iter, i)=>new Enemy(imgWidth*(i*1.6+1)/2));
 
 
-console.log(allEnemies)
-
-document.addEventListener('keydown', function(e) {
-    var allowedKeys = {
-        37: 'left',
-        38: 'up',
-        39: 'right',
-        40: 'down'
-    };
-
-    player.handleInput(allowedKeys[e.keyCode]);
-});
