@@ -5,7 +5,6 @@ export  const canvasHeight = 600;
 export  const imgWidth = 101;
 export  const imgHeight = 171;
 
-// The Enemy who will be avoided
 export class Enemy {
     constructor(y) {
         this.x = -imgWidth;
@@ -17,8 +16,6 @@ export class Enemy {
 
     update() {
         this.x += this.speed;
-        this.render();
-
     }
 
     render() {

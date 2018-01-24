@@ -188,7 +188,6 @@ const imgHeight = 171;
 /* unused harmony export imgHeight */
 
 
-// The Enemy who will be avoided
 class Enemy {
     constructor(y) {
         this.x = -imgWidth;
@@ -200,8 +199,6 @@ class Enemy {
 
     update() {
         this.x += this.speed;
-        this.render();
-
     }
 
     render() {
@@ -300,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const firstPage = document.querySelector('.page0');
     const secondPage = document.querySelector('.page1');
     const thirdPage = document.querySelector('.page2');
-    const playerSelect = [...document.querySelectorAll('.player-select')];
-    const levelSelect = [...document.querySelectorAll('.level-select')];
+    const allAvailPlayers = [...document.querySelectorAll('.player-select')];
+    const allAvailLevels = [...document.querySelectorAll('.level-select')];
 
 
     // App Global Variables
@@ -311,7 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let chosenLevel = 1;
     let playerSpirit = localStorage.getItem('player:spirit');
 
-
+    // Load the resources in background at first place
     __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
         'images/stone-block.png',
         'images/water-block.png',
@@ -323,21 +320,23 @@ document.addEventListener('DOMContentLoaded', () => {
         'images/char-pink-girl.png'
     ]);
 
-    setTimeout( ()=>{ // remove the splash screen after 2.5seconds
+    setTimeout( ()=>{ // remove the splash screen after specific period
         firstPage.classList.add('to-bottom');
 
         if (!playerSpirit) { // check if any stored player selection
-            playerSelect.forEach(label => {
+
+            allAvailPlayers.forEach(label => {
+                // listen on selecting player
                 label.addEventListener('click', () => {
                     setTimeout(() => {
-                        chosenSpirit = document.querySelector('input[name="player-on"]:checked').value;
-                        localStorage.setItem('player:spirit', chosenSpirit);
-
+                        chosenSpirit = document.querySelector('input[name="player-on"]:checked').value; // get the selected player images
+                        localStorage.setItem('player:spirit', chosenSpirit); // save image url to localStorage
                     }, 0);
 
+                    // remove the second into page and proceed to third page
                     secondPage.classList.add('to-bottom');
 
-                    levelSelect.forEach(level=>{
+                    allAvailLevels.forEach(level=>{ // same logic as selecting player
                         level.addEventListener('click',()=>{
                             setTimeout(() => {
                                 chosenLevel = document.querySelector('input[name="level-on"]:checked').value;
@@ -348,7 +347,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             handleGame(chosenSpirit, chosenLevel)
                         })
                     })
-
                 })
             });
         } else {
@@ -359,16 +357,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function handleGame (chosenSpirit) {
-        __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
-            'images/stone-block.png',
-            'images/water-block.png',
-            'images/grass-block.png',
-            'images/enemy-bug.png',
-            'images/char-boy.png',
-            'images/char-cat-girl.png',
-            'images/char-horn-girl.png',
-            'images/char-pink-girl.png'
-        ]);
         __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].onReady(arcadeEngine.init.call(arcadeEngine, chosenSpirit, chosenLevel));
         arcadeEngine.showCanvas();
     }
@@ -377,13 +365,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // App Event Listeners
 
     document.addEventListener('keydown', function (e) {
+        /*
+            make only left and right event listener available
+            when user key down that allow continuous character moving  while pressing
+            that mechanism is what i want to apply
+         */
         const allowedKeys = {
             37: 'left',
-            38: 'up',
             39: 'right',
+        };
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+    });
+    document.addEventListener('keyup', function (e) {
+        // key up event to make the character move one positions if he had put his finger for a bit of time
+        const allowedKeys = {
+            38: 'up',
             40: 'down'
         };
-
         arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
     });
 
@@ -398,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__levell__ = __webpack_require__(5);
 /* Engine.js
  * This file provides the game loop functionality (update entities and render),
  * draws the initial game board on the screen, and then calls the update and
@@ -412,6 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
  * This engine makes the canvas' context (ctx) object globally available to make
  * writing app.js a little simpler to work with.
  */
+
 
 
 
@@ -433,10 +433,10 @@ const canvasWidth = 505;
 /* unused harmony export canvasWidth */
 
 const imgWidth = 101;
-/* unused harmony export imgWidth */
+/* harmony export (immutable) */ __webpack_exports__["c"] = imgWidth;
 
 const imgHeight = 171;
-/* unused harmony export imgHeight */
+/* harmony export (immutable) */ __webpack_exports__["b"] = imgHeight;
 
 
 class Engine {
@@ -450,6 +450,7 @@ class Engine {
         this.lastTime = 0;
         this.canvas = document.getElementById('my-canvas');
         this.ctx = this.canvas.getContext('2d');
+        this.gamelavel = localStorage.getItem('player:level');
         /* Go ahead and load all of the images we know we're going to need to
           * draw our game level. Then set init as the callback method, so that when
           * all of these images are properly loaded our game will start.
@@ -538,7 +539,8 @@ class Engine {
         this.allEnemies.forEach( (enemy, i)=> {
             enemy.update();
             if (enemy.x >= canvasWidth + imgWidth) {
-                this.allEnemies.splice(i, 1)
+                this.allEnemies.splice(i, 1);
+                this.allEnemies.push(new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](__WEBPACK_IMPORTED_MODULE_1__app__["c" /* imgWidth */]*(i*1.6+1)/2))
             } else if (enemy.x + imgWidth >= this.player.x && enemy.x + imgWidth <= this.player.x + imgWidth && enemy.y + imgHeight - 30 >= this.player.y + 60 && enemy.y + imgHeight - 30 < this.player.y + imgHeight - 30) {
                 this.gameEnd(false);
                 console.warn('you lose')
@@ -551,7 +553,7 @@ class Engine {
         let dialog = document.getElementById('status-dialog');
         dialog.show();
         dialog.classList.add('dialog-scale');
-        dialog.children[0].textContent = res ? 'You won' : 'You lose';
+        dialog.children[0].innerHTML = res ? '<p>Congratulations</p><span>You passed the Road Safely</span> ' : '<p>Opps</p><span>a BUG! crached you!</span> ';
         dialog.children[1].addEventListener('click', () => {
             this.init();
             dialog.classList.remove('dialog-scale');
@@ -568,44 +570,15 @@ class Engine {
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
      */
-     render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        let rowImages = [
-                'images/grass-block.png',    // Row 2 of 2 of grass
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            numRows = 9,
-            numCols = 5,
-            row, col;
+     render(gameLevel = 1) {
+
+        const level = new __WEBPACK_IMPORTED_MODULE_2__levell__["a" /* Level */](gameLevel);
 
         // Before drawing, clear existing canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
-         */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
 
-                this.ctx.drawImage(__WEBPACK_IMPORTED_MODULE_0__resources__["Resources"].get(rowImages[row]), col * imgWidth, (row - 1) * imgHeight / 2.8);
-            }
-        }
+        // render the right images of the level
+        level.createLevel(this.ctx, __WEBPACK_IMPORTED_MODULE_0__resources__["Resources"]);
 
         this.renderEntities();
     }
@@ -665,6 +638,69 @@ try {
 // easier to handle this case. if(!global) { ...}
 
 module.exports = g;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(3);
+
+
+class Level {
+    constructor(id = 1) {
+        this.id = id;
+        this._rowImages = this.getReqImages();
+    }
+
+    createLevel(canavsCtx, resources) {
+
+        /* Loop through the number of rows and columns we've defined above
+         * and, using the rowImages array, draw the correct image for that
+         * portion of the "grid"
+         */
+        for (let row = 0; row < this.numRows; row++) {
+            for (let col = 0; col < this.numCols; col++) {
+                canavsCtx.drawImage(resources.get(this._rowImages[row]), col * __WEBPACK_IMPORTED_MODULE_0__engine__["c" /* imgWidth */], (row - 1) * __WEBPACK_IMPORTED_MODULE_0__engine__["b" /* imgHeight */] / 2.8);
+            }
+        }
+    }
+
+    getReqImages() {
+        switch (this.id) {
+            case 1 :
+                return [
+                    'images/grass-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/stone-block.png',
+                    'images/grass-block.png'
+                ];
+            case 2:
+                return [
+                    'images/grass-block.png',
+                    'images/water-block.png'
+                ];
+
+        }
+    }
+
+    get numRows() {
+        return this._rowImages.length;
+    }
+
+    get numCols() {
+        return 5 // for now
+    }
+
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Level;
 
 
 /***/ })

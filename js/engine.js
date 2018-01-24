@@ -15,6 +15,7 @@
 import {Resources} from './resources';
 import {Player, Enemy} from "./app";
 import * as AppClasses from "./app";
+import {Level} from "./levell";
 
 
 export const doc = global.document,
@@ -36,6 +37,7 @@ export  class Engine {
         this.lastTime = 0;
         this.canvas = document.getElementById('my-canvas');
         this.ctx = this.canvas.getContext('2d');
+        this.gamelavel = localStorage.getItem('player:level');
         /* Go ahead and load all of the images we know we're going to need to
           * draw our game level. Then set init as the callback method, so that when
           * all of these images are properly loaded our game will start.
@@ -124,7 +126,8 @@ export  class Engine {
         this.allEnemies.forEach( (enemy, i)=> {
             enemy.update();
             if (enemy.x >= canvasWidth + imgWidth) {
-                this.allEnemies.splice(i, 1)
+                this.allEnemies.splice(i, 1);
+                this.allEnemies.push(new Enemy(AppClasses.imgWidth*(i*1.6+1)/2))
             } else if (enemy.x + imgWidth >= this.player.x && enemy.x + imgWidth <= this.player.x + imgWidth && enemy.y + imgHeight - 30 >= this.player.y + 60 && enemy.y + imgHeight - 30 < this.player.y + imgHeight - 30) {
                 this.gameEnd(false);
                 console.warn('you lose')
@@ -137,7 +140,7 @@ export  class Engine {
         let dialog = document.getElementById('status-dialog');
         dialog.show();
         dialog.classList.add('dialog-scale');
-        dialog.children[0].textContent = res ? 'You won' : 'You lose';
+        dialog.children[0].innerHTML = res ? '<p>Congratulations</p><span>You passed the Road Safely</span> ' : '<p>Opps</p><span>a BUG! crached you!</span> ';
         dialog.children[1].addEventListener('click', () => {
             this.init();
             dialog.classList.remove('dialog-scale');
@@ -154,44 +157,15 @@ export  class Engine {
      * they are flipbooks creating the illusion of animation but in reality
      * they are just drawing the entire screen over and over.
      */
-     render() {
-        /* This array holds the relative URL to the image used
-         * for that particular row of the game level.
-         */
-        let rowImages = [
-                'images/grass-block.png',    // Row 2 of 2 of grass
-                'images/stone-block.png',   // Row 1 of 3 of stone
-                'images/stone-block.png',   // Row 2 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/stone-block.png',   // Row 3 of 3 of stone
-                'images/grass-block.png'    // Row 2 of 2 of grass
-            ],
-            numRows = 9,
-            numCols = 5,
-            row, col;
+     render(gameLevel = 1) {
+
+        const level = new Level(gameLevel);
 
         // Before drawing, clear existing canvas
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        /* Loop through the number of rows and columns we've defined above
-         * and, using the rowImages array, draw the correct image for that
-         * portion of the "grid"
-         */
-        for (row = 0; row < numRows; row++) {
-            for (col = 0; col < numCols; col++) {
-                /* The drawImage function of the canvas' context element
-                 * requires 3 parameters: the image to draw, the x coordinate
-                 * to start drawing and the y coordinate to start drawing.
-                 * We're using our Resources helpers to refer to our images
-                 * so that we get the benefits of caching these images, since
-                 * we're using them over and over.
-                 */
 
-                this.ctx.drawImage(Resources.get(rowImages[row]), col * imgWidth, (row - 1) * imgHeight / 2.8);
-            }
-        }
+        // render the right images of the level
+        level.createLevel(this.ctx, Resources);
 
         this.renderEntities();
     }

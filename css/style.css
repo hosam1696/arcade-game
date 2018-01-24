@@ -183,25 +183,33 @@ body {
 }
 dialog {
     background: linear-gradient(#333, #191919);
-    border: 1px solid #555;
-    box-shadow: 5px 5px 10px;
+    border: 1px solid #333;
+    box-shadow: 5px 5px 20px;
     width: 250px;
     height: 150px;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
     visibility: hidden;
     transform: scale(0.1);
     transition: transform 200ms;
+    padding: 8px;
+    border-radius: 3px;
 }
 dialog p {
     text-align: center;
     font-size: 30px;
-    margin: 10px 0;
+    margin: -15px 0 10px 0;
     color: #fff
 }
+dialog span {
+    display: flex;
+    justify-content: center;
+    color: #ccc;
+}
 dialog button {
+    display: flex;
+    justify-content: center;
     background-color: #007aff;
     color: #fff;
     padding: 10px;
@@ -209,6 +217,7 @@ dialog button {
     border-radius: 4px;
     width: 50%;
     cursor: pointer;
+    margin: 10px auto;
 }
 dialog.dialog-scale {
     visibility: visible;
