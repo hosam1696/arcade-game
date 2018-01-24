@@ -60,94 +60,118 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__resources__);
-
-
-
-
-document.addEventListener('DOMContentLoaded', () => {
-
-    // App Selectors
-
-
-    // App Global Variables
-    const arcadeEngine = new __WEBPACK_IMPORTED_MODULE_0__engine__["a" /* Engine */]();
-
-    __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
-        'images/stone-block.png',
-        'images/water-block.png',
-        'images/grass-block.png',
-        'images/enemy-bug.png',
-        'images/char-boy.png',
-        'images/char-cat-girl.png',
-        'images/char-horn-girl.png',
-        'images/char-pink-girl.png'
-    ]);
-
-
-    let playerSpirit = localStorage.getItem('player:spirit');
-    if (!playerSpirit) { // check if any stored player selection
-        [...document.querySelectorAll('.player-select')].forEach(label => {
-            label.addEventListener('click', () => {
-                setTimeout(() => {
-                    let choosenSpirit = document.querySelector('input[type="radio"]:checked').value;
-
-                    localStorage.setItem('player:spirit', choosenSpirit);
-                    __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
-                        'images/stone-block.png',
-                        'images/water-block.png',
-                        'images/grass-block.png',
-                        'images/enemy-bug.png',
-                        'images/char-boy.png',
-                        'images/char-cat-girl.png',
-                        'images/char-horn-girl.png',
-                        'images/char-pink-girl.png'
-                    ]);
-                    __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].onReady(arcadeEngine.init.call(arcadeEngine, choosenSpirit));
-                    arcadeEngine.showCanvas();
-                }, 0)
-            })
-        });
-    } else {
-        arcadeEngine.init();
-        arcadeEngine.showCanvas();
+/* Resources.js
+ * This is simply an image loading utility. It eases the process of loading
+ * image files so that they can be used within your game. It also includes
+ * a simple "caching" layer so it will reuse cached images if you attempt
+ * to load the same image multiple times.
+ */
+ class Resource {
+    constructor() {
+        this.resourceCache = {};
+        this.loading = [];
+        this.readyCallbacks = [];
     }
 
+    load(urlOrArr) {
+        if(urlOrArr instanceof Array) {
+            /* If the developer passed in an array of images
+             * loop through each value and call our image
+             * loader on that image file
+             */
+            urlOrArr.forEach((url) => {
+                this._load(url);
+            });
+
+        } else {
+            /* The developer did not pass an array to this function,
+             * assume the value is a string and call our image loader
+             * directly.
+             */
+            this._load(urlOrArr);
+        }
+    }
+
+    _load(url) {
+        if(this.resourceCache[url]) {
+            /* If this URL has been previously loaded it will exist within
+             * our resourceCache array. Just return that image rather
+             * re-loading the image.
+             */
+            return this.resourceCache[url];
+        } else {
+            /* This URL has not been previously loaded and is not present
+             * within our cache; we'll need to load this image.
+             */
+            let img = new Image();
+            img.onload = () => {
+                /* Once our image has properly loaded, add it to our cache
+                 * so that we can simply return this image if the developer
+                 * attempts to load this file in the future.
+                 */
+                this.resourceCache[url] = img;
+
+                /* Once the image is actually loaded and properly cached,
+                 * call all of the onReady() callbacks we have defined.
+                 */
+                if(this.isReady()) {
+                    this.readyCallbacks.forEach(func => func());
+                }
+            };
+
+            /* Set the initial cache value to false, this will change when
+             * the image's onload event handler is called. Finally, point
+             * the image's src attribute to the passed in URL.
+             */
+            this.resourceCache[url] = img;
+            img.src = url;
+        }
+    }
+
+    get(url) {
+        return this.resourceCache[url];
+    }
+
+    isReady() {
+        let ready = true;
+        for(let k in this.resourceCache) {
+            if(this.resourceCache.hasOwnProperty(k) &&
+                !this.resourceCache[k]) {
+                ready = false;
+            }
+        }
+        return ready;
+    }
+
+    /* This function will add a function to the callback stack that is called
+     * when all requested images are properly loaded.
+     */
+    onReady(func) {
+        this.readyCallbacks.push(func);
+    }
+
+}
+
+module.exports = {
+    Resources: new Resource()
+};
 
 
-    // App Event Listeners
 
-    document.addEventListener('keydown', function (e) {
-        const allowedKeys = {
-            37: 'left',
-            38: 'up',
-            39: 'right',
-            40: 'down'
-        };
-
-        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
-    });
-
-
-});
 
 /***/ }),
 /* 1 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
 
 
@@ -259,114 +283,119 @@ class Player {
 
 /***/ }),
 /* 2 */
-/***/ (function(module, __webpack_exports__) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* Resources.js
- * This is simply an image loading utility. It eases the process of loading
- * image files so that they can be used within your game. It also includes
- * a simple "caching" layer so it will reuse cached images if you attempt
- * to load the same image multiple times.
- */
- class Resource {
-    constructor() {
-        this.resourceCache = {};
-        this.loading = [];
-        this.readyCallbacks = [];
-    }
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__resources__);
 
-    load(urlOrArr) {
-        if(urlOrArr instanceof Array) {
-            /* If the developer passed in an array of images
-             * loop through each value and call our image
-             * loader on that image file
-             */
-            urlOrArr.forEach((url) => {
-                this._load(url);
+
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // App Selectors
+    const firstPage = document.querySelector('.page0');
+    const secondPage = document.querySelector('.page1');
+    const thirdPage = document.querySelector('.page2');
+    const playerSelect = [...document.querySelectorAll('.player-select')];
+    const levelSelect = [...document.querySelectorAll('.level-select')];
+
+
+    // App Global Variables
+    const arcadeEngine = new __WEBPACK_IMPORTED_MODULE_0__engine__["a" /* Engine */]();
+    const screenTime = 2500;
+    let chosenSpirit = null;
+    let chosenLevel = 1;
+    let playerSpirit = localStorage.getItem('player:spirit');
+
+
+    __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
+        'images/stone-block.png',
+        'images/water-block.png',
+        'images/grass-block.png',
+        'images/enemy-bug.png',
+        'images/char-boy.png',
+        'images/char-cat-girl.png',
+        'images/char-horn-girl.png',
+        'images/char-pink-girl.png'
+    ]);
+
+    setTimeout( ()=>{ // remove the splash screen after 2.5seconds
+        firstPage.classList.add('to-bottom');
+
+        if (!playerSpirit) { // check if any stored player selection
+            playerSelect.forEach(label => {
+                label.addEventListener('click', () => {
+                    setTimeout(() => {
+                        chosenSpirit = document.querySelector('input[name="player-on"]:checked').value;
+                        localStorage.setItem('player:spirit', chosenSpirit);
+
+                    }, 0);
+
+                    secondPage.classList.add('to-bottom');
+
+                    levelSelect.forEach(level=>{
+                        level.addEventListener('click',()=>{
+                            setTimeout(() => {
+                                chosenLevel = document.querySelector('input[name="level-on"]:checked').value;
+                                console.log('level', chosenLevel);
+                                localStorage.setItem('player:level', String(chosenLevel));
+                            });
+                            thirdPage.classList.add('to-bottom');
+                            handleGame(chosenSpirit, chosenLevel)
+                        })
+                    })
+
+                })
             });
-
         } else {
-            /* The developer did not pass an array to this function,
-             * assume the value is a string and call our image loader
-             * directly.
-             */
-            this._load(urlOrArr);
+            arcadeEngine.init();
+            arcadeEngine.showCanvas();
         }
+    }, screenTime);
+
+
+    function handleGame (chosenSpirit) {
+        __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].load([
+            'images/stone-block.png',
+            'images/water-block.png',
+            'images/grass-block.png',
+            'images/enemy-bug.png',
+            'images/char-boy.png',
+            'images/char-cat-girl.png',
+            'images/char-horn-girl.png',
+            'images/char-pink-girl.png'
+        ]);
+        __WEBPACK_IMPORTED_MODULE_1__resources__["Resources"].onReady(arcadeEngine.init.call(arcadeEngine, chosenSpirit, chosenLevel));
+        arcadeEngine.showCanvas();
     }
 
-    _load(url) {
-        if(this.resourceCache[url]) {
-            /* If this URL has been previously loaded it will exist within
-             * our resourceCache array. Just return that image rather
-             * re-loading the image.
-             */
-            return this.resourceCache[url];
-        } else {
-            /* This URL has not been previously loaded and is not present
-             * within our cache; we'll need to load this image.
-             */
-            let img = new Image();
-            img.onload = () => {
-                /* Once our image has properly loaded, add it to our cache
-                 * so that we can simply return this image if the developer
-                 * attempts to load this file in the future.
-                 */
-                this.resourceCache[url] = img;
 
-                /* Once the image is actually loaded and properly cached,
-                 * call all of the onReady() callbacks we have defined.
-                 */
-                if(this.isReady()) {
-                    this.readyCallbacks.forEach(func => func());
-                }
-            };
+    // App Event Listeners
 
-            /* Set the initial cache value to false, this will change when
-             * the image's onload event handler is called. Finally, point
-             * the image's src attribute to the passed in URL.
-             */
-            this.resourceCache[url] = img;
-            img.src = url;
-        }
-    }
+    document.addEventListener('keydown', function (e) {
+        const allowedKeys = {
+            37: 'left',
+            38: 'up',
+            39: 'right',
+            40: 'down'
+        };
 
-    get(url) {
-        return this.resourceCache[url];
-    }
-
-    isReady() {
-        let ready = true;
-        for(let k in this.resourceCache) {
-            if(this.resourceCache.hasOwnProperty(k) &&
-                !this.resourceCache[k]) {
-                ready = false;
-            }
-        }
-        return ready;
-    }
-
-    /* This function will add a function to the callback stack that is called
-     * when all requested images are properly loaded.
-     */
-    onReady(func) {
-        this.readyCallbacks.push(func);
-    }
-
-}
-
-module.exports = {
-    Resources: new Resource()
-};
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+    });
 
 
-
+});
 
 /***/ }),
 /* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(2);
+/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(1);
 /* Engine.js
@@ -432,7 +461,7 @@ class Engine {
      * particularly setting the lastTime variable that is required for the
      * game loop.
      */
-     init(playerSpirit = localStorage.getItem('player:spirit')) {
+     init(playerSpirit = localStorage.getItem('player:spirit'), level = 1) {
         // player = new Player();
         // console.log(playerSpirit);
          this.reset();

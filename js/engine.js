@@ -47,7 +47,7 @@ export  class Engine {
      * particularly setting the lastTime variable that is required for the
      * game loop.
      */
-     init(playerSpirit = localStorage.getItem('player:spirit')) {
+     init(playerSpirit = localStorage.getItem('player:spirit'), level = 1) {
         // player = new Player();
         // console.log(playerSpirit);
          this.reset();

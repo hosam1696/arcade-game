@@ -9,7 +9,13 @@
 </head>
 <body>
     <section id="init-game">
-        <div class="page1 ">
+        <div class="page page0">
+            <div class="logo-text">
+                <h2>Arcade Game</h2>
+                <p><span>&lt;&gt;</span> by Hosam Elnabawy</p>
+            </div>
+        </div>
+        <div class="page page1 ">
             <h1>select your player</h1>
             <div class="labels">
                 <label  class="player-select" for="boy-player">
@@ -33,6 +39,23 @@
                 <input name="player-on" id="girl-pink-player" type="radio" value="images/char-pink-girl.png">
             </div>
 
+        </div>
+        <div class="page page2">
+            <h1>choose Level</h1>
+            <div class="labels">
+                <label  class="level-select" for="level-one">
+                    <span class="level-label">Level 1</span>
+                    <img src="images/grass-block.png" alt="boy player">
+                </label>
+                <input name="level-on" id="level-one" type="radio" value="1">
+
+                <label class="level-select" for="level-two">
+                    <span class="level-label">Level 2</span>
+                    <img src="images/stone-block.png" alt="girl player">
+                </label>
+                <input name="level-on"  id="level-two" type="radio" value="2">
+
+            </div>
         </div>
     </section>
     <section id="arcade-game">
