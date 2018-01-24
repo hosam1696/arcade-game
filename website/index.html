@@ -5,8 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Arcade Game</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-    
+    <section id="init-game">
+        <div class="page page0">
+            <div class="logo-text">
+                <h2>Arcade Game</h2>
+                <p><span>&lt;&gt;</span> by Hosam Elnabawy</p>
+            </div>
+        </div>
+        <div class="page page1 ">
+            <h1>select your player</h1>
+            <div class="labels">
+                <label  class="player-select" for="boy-player">
+                    <img src="images/char-boy.png" alt="boy player">
+                </label>
+                <input name="player-on" id="boy-player" type="radio" value="images/char-boy.png">
+
+                <label class="player-select" for="girl-player">
+                    <img src="images/char-cat-girl.png" alt="girl player">
+                </label>
+                <input name="player-on" id="girl-player" type="radio" value="images/char-cat-girl.png">
+
+                <label  class="player-select" for="girl-horn-player">
+                    <img src="images/char-horn-girl.png" alt="girl player">
+                </label>
+                <input name="player-on" id="girl-horn-player" type="radio" value="images/char-horn-girl.png">
+
+                <label class="player-select" for="girl-pink-player">
+                    <img src="images/char-pink-girl.png" alt="girl player">
+                </label>
+                <input name="player-on" id="girl-pink-player" type="radio" value="images/char-pink-girl.png">
+            </div>
+
+        </div>
+        <div class="page page2">
+            <h1>choose Level</h1>
+            <div class="labels">
+                <label  class="level-select" for="level-one">
+                    <span class="level-label">Level 1</span>
+                    <img src="images/grass-block.png" alt="boy player">
+                </label>
+                <input name="level-on" id="level-one" type="radio" value="1">
+
+                <label class="level-select" for="level-two">
+                    <span class="level-label">Level 2</span>
+                    <img src="images/stone-block.png" alt="girl player">
+                </label>
+                <input name="level-on"  id="level-two" type="radio" value="2">
+
+            </div>
+        </div>
+    </section>
+    <section id="arcade-game">
+        <dialog id="status-dialog" >
+            <p></p>
+            <button type="button" id="restart-game"> start over</button>
+        </dialog>
+        <canvas id="my-canvas" width="505" height="600"></canvas>
+
+    </section>
+    <script src="js/main.bundle.js"></script>
+    <!--<script src="js/resources.js"></script>-->
+    <!--<script src="js/app.js"></script>-->
+    <!--<script src="js/engine.js"></script>-->
 </body>
 </html>

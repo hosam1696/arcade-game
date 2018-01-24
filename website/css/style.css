@@ -1,0 +1,219 @@
+body {
+    padding: 0;
+    margin: 0;
+    background: linear-gradient(#f45b11, #f43f80);
+    width: 100vw;
+    overflow: hidden;
+    font-family: "Roboto", "Helvetica Neue", sans-serif;
+
+}
+* {
+    box-sizing: border-box;
+}
+#arcade-game {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+#arcade-game  #my-canvas {
+
+}
+#init-game {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    position: relative;
+}
+
+ #init-game .page {
+     position: absolute;
+    width: 505px;
+    height: 600px;
+    background: linear-gradient(#333, #191919);
+    display: flex;
+    flex-direction: column;
+    padding: 40px 20px;
+    transition: transform 300ms ease-in-out;
+}
+
+#init-game .page0 {
+    z-index: 3;
+    justify-content: center;
+    align-items: center;
+    color: #eee;
+    letter-spacing: 1px;
+}
+#init-game .page1 {
+    z-index: 2;
+}
+
+#init-game .page2 {
+    z-index: 1;
+}
+#init-game .page0 .logo-text {
+    /*background-color: #222;*/
+    padding: 5px 8px;
+    position: relative;
+    overflow: hidden;
+}
+#init-game .page0 .logo-text h2 {
+    background-color: #272727;
+    transform: translateY(-150%) scale(0.2);
+    animation: animtobottom 0.5s forwards 0.7s;
+}
+#init-game .page0 .logo-text:after {
+    content: '';
+    position: absolute;
+    top: 40px;
+    right: 0;
+    display: flex;
+    width: 100%;
+    height: 4px;
+    background-color: #007aff;
+    transform: translateX(-100%);
+    border-radius: 5px;
+    animation: animtoright 0.6s forwards 0.2s linear;
+}
+@keyframes animtoright {
+
+    70% {
+        transform: translateX(0) ;
+        top: 40px;
+    }
+    100% {
+        top: 55px;
+        transform: translateX(0) ;
+    }
+}
+@keyframes animtobottom {
+    to {
+        transform: translateY(0) scale(1);
+    }
+}
+#init-game .page0 p {
+    text-align: center;
+    font-size: 12px;
+    color: #ccc;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards 1s;
+    transform: translateY(-30px);
+}
+#init-game .page0 p span{
+    color: #007aff;
+}
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+        transform: translateY(-8px)
+    }
+}
+#init-game .to-bottom {
+    perspective: 200px;
+    transform-origin: center;
+    transform:  rotateY(90deg);
+}
+#init-game .page1 .labels, #init-game .page2 .labels {
+    display: flex;
+    width: 104%;
+    height: 100%;
+    flex-flow: wrap;
+    justify-content: center;
+    align-items: center;
+}
+#init-game .page1 .labels label, #init-game .page2 .labels label {
+    background: #333;
+    border:1px solid #555;
+    min-width: 200px;
+    width: 200px;
+    height: 200px;
+    text-align: center;
+    border-radius: 10px;
+    transition: background 0.3s ease-in-out;
+    cursor: pointer;
+    transform: scale(0);
+    animation: grow 0.2s forwards;
+    position: relative;
+}
+#init-game .page1 .labels label:first-of-type {
+    animation-delay: 50ms;
+}
+
+#init-game .page1 .labels label:nth-of-type(2) {
+    animation-delay: 130ms;
+}
+
+#init-game .page1 .labels label:nth-of-type(3){
+    animation-delay: 200ms;
+}
+
+#init-game .page1 .labels label:last-of-type {
+    animation-delay: 350ms;
+}
+@keyframes grow  {
+    to {transform: scale(1)}
+}
+#init-game .page1 label:hover {
+    background: #007aff;
+}
+#init-game .page1 h1, #init-game .page2 h1 {
+    color: #eee;
+    text-align: center;
+    font-weight: 100;
+    letter-spacing: 1px;
+    text-transform: capitalize;
+}
+#init-game .page1 input[type='radio'], #init-game .page2 input[type='radio']{
+    transform: scale(0);
+}
+
+#init-game .page2 .labels label {
+    border: 1px solid #007aff;
+}
+#init-game .page2 .labels label span {
+    position: absolute;
+    top: 20px;
+    left: -12px;
+    background-color: #007aff;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    transform: skew(-5deg);
+}
+dialog {
+    background: linear-gradient(#333, #191919);
+    border: 1px solid #555;
+    box-shadow: 5px 5px 10px;
+    width: 250px;
+    height: 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    visibility: hidden;
+    transform: scale(0.1);
+    transition: transform 200ms;
+}
+dialog p {
+    text-align: center;
+    font-size: 30px;
+    margin: 10px 0;
+    color: #fff
+}
+dialog button {
+    background-color: #007aff;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    width: 50%;
+    cursor: pointer;
+}
+dialog.dialog-scale {
+    visibility: visible;
+    transform: scale(1);
+}
+dialog::backdrop {
+    background: rgba(255,0,0,.25);
+}
