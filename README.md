@@ -1,58 +1,59 @@
-# Free Code Camp 
+# Udacity Arcade Game Project
 
-*check repo branches*
+Arcade game is built by `Javacsript`
+ on the web using latest version of the language 
 
-![check branches](./branches.png)
+and *Canvas API*
 
-## (1) Front End Development Certification
+The project is composed of two *sections* or *parts*
 
-* Basic Front End Development Projects
+![sdsd](images/mac.png)
 
-* JQuery
+WEB Version
+---
 
-* Basic Javascript
+#### Installing
 
-* Object Oriented and Functional Programming
+```shell
+// clone the project
+$  git clone https://github.com/hosamsam/arcade-game.git
 
-* Basic Algorithm Scripts
+// list the branches
+$  git branch -v -a
 
-* JSON Api and Ajax
+// branch *gh-pages* is for hosting the game
 
-* Intermediate Front End Development Projects
+$ git checkout gh-pages
 
-* Intermediate Algorithm Scripting
+```
 
-* Advanced Algorithm Scripting
+after you are on the right branch and project
 
-* Advanced Front End Development Projects
+you can install it's dependencies by
 
+```shell
+$ npm install
+```
 
-## (2) Back End Development Certification
-
-* GIT
-
-* Nodejs and Express.js
-
-* MongoDB
-
-* API Projects
-
-* Dynamic Web Applications Projects
+now yo can review the code and send me feedbacks
 
 
-## (3) Video Challlenges
+```shell
 
-* Computer Basics
+$ npm start  // for local-server-live-reload
 
-* The Dom
+$ npm webpack // simplest webpack js bundler if you had edited the code
 
-* Chrome Developer Tools
-
-
-# (4) Coding Interview Preparation
-
-* Coding Interview Training
-
-* Mock Interviews
+```
 
 
+
+#### CONTRIBUTING
+
+*SOON*
+
+
+
+
+App Version 
+---
