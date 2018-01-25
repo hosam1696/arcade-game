@@ -13,7 +13,7 @@
  * writing app.js a little simpler to work with.
  */
 import {Resources} from './resources';
-import {Player, Enemy, bugHeight, playerImgWidth, canvasWidth, canvasHeight, bugWidth} from "./app";
+import {Player, Enemy, BUG_HEIGHT, PLAYER_IMG_WIDTH, CANVAS_WIDTH, CANVAS_HEIGHT, BUG_WIDTH} from "./app";
 import {Level} from "./level";
 
 
@@ -123,10 +123,10 @@ export  class Engine {
                 console.warn('you lose');
                 this.requestFrame = false;
             }
-             if (enemy.x +bugWidth >= this.player.x &&
-                 enemy.x + bugWidth <= this.player.x + playerImgWidth &&
-                 enemy.y + bugHeight - 30 >= this.player.y + 60 &&
-                 enemy.y + bugHeight - 30 < this.player.y + bugHeight) {
+             if (enemy.x +BUG_WIDTH >= this.player.x &&
+                 enemy.x + BUG_WIDTH <= this.player.x + PLAYER_IMG_WIDTH &&
+                 enemy.y + BUG_HEIGHT - 30 >= this.player.y + 60 &&
+                 enemy.y + BUG_HEIGHT - 30 < this.player.y + BUG_HEIGHT) {
 
             }
         });
@@ -148,9 +148,9 @@ export  class Engine {
      updateEntities() {
         this.allEnemies.forEach( (enemy, i)=> {
             enemy.update();
-            if (enemy.x >= canvasWidth + playerImgWidth) {
-                this.allEnemies.splice(i, 1);
-                this.allEnemies.splice(i,0,new Enemy(i))
+            if (enemy.x >= CANVAS_WIDTH + PLAYER_IMG_WIDTH) {
+
+                this.allEnemies.splice(i, 1, new Enemy(i))
             }
         });
         this.player.update();
@@ -182,7 +182,7 @@ export  class Engine {
         const level = new Level(gameLevel);
 
         // Before drawing, clear existing canvas
-        this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+        this.ctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
         // render the right images of the level
         level.createLevel(this.ctx, Resources);

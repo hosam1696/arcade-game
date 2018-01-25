@@ -5,20 +5,21 @@ body {
     width: 100vw;
     overflow: hidden;
     font-family: "Roboto", "Helvetica Neue", sans-serif;
-
 }
+
 * {
     box-sizing: border-box;
 }
+
 #arcade-game {
     display: none;
     justify-content: center;
     align-items: center;
     height: 100vh;
 }
-#arcade-game  #my-canvas {
 
-}
+#arcade-game #my-canvas {}
+
 #init-game {
     display: flex;
     justify-content: center;
@@ -27,8 +28,8 @@ body {
     position: relative;
 }
 
- #init-game .page {
-     position: absolute;
+#init-game .page {
+    position: absolute;
     width: 505px;
     height: 650px;
     background: linear-gradient(#333, #191919);
@@ -45,6 +46,7 @@ body {
     color: #eee;
     letter-spacing: 1px;
 }
+
 #init-game .page1 {
     z-index: 2;
 }
@@ -52,17 +54,20 @@ body {
 #init-game .page2 {
     z-index: 1;
 }
+
 #init-game .page0 .logo-text {
     /*background-color: #222;*/
     padding: 5px 8px;
     position: relative;
     overflow: hidden;
 }
+
 #init-game .page0 .logo-text h2 {
     background-color: #272727;
     transform: translateY(-150%) scale(0.2);
     animation: animtobottom 0.5s forwards 0.7s;
 }
+
 #init-game .page0 .logo-text:after {
     content: '';
     position: absolute;
@@ -76,22 +81,24 @@ body {
     border-radius: 5px;
     animation: animtoright 0.6s forwards 0.2s linear;
 }
-@keyframes animtoright {
 
+@keyframes animtoright {
     70% {
-        transform: translateX(0) ;
+        transform: translateX(0);
         top: 40px;
     }
     100% {
         top: 55px;
-        transform: translateX(0) ;
+        transform: translateX(0);
     }
 }
+
 @keyframes animtobottom {
     to {
         transform: translateY(0) scale(1);
     }
 }
+
 #init-game .page0 p {
     text-align: center;
     font-size: 12px;
@@ -100,21 +107,26 @@ body {
     animation: fadeIn 0.3s forwards 1s;
     transform: translateY(-30px);
 }
-#init-game .page0 p span{
+
+#init-game .page0 p span {
     color: #007aff;
 }
+
 @keyframes fadeIn {
     to {
         opacity: 1;
         transform: translateY(-8px)
     }
 }
+
 #init-game .to-bottom {
     perspective: 200px;
     transform-origin: center;
-    transform:  rotateY(90deg);
+    transform: rotateY(90deg);
 }
-#init-game .page1 .labels, #init-game .page2 .labels {
+
+#init-game .page1 .labels,
+#init-game .page2 .labels {
     display: flex;
     width: 104%;
     height: 100%;
@@ -122,7 +134,9 @@ body {
     justify-content: center;
     align-items: center;
 }
-#init-game .page1 .labels label, #init-game .page2 .labels label {
+
+#init-game .page1 .labels label,
+#init-game .page2 .labels label {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -139,6 +153,7 @@ body {
     animation: grow 0.2s forwards;
     position: relative;
 }
+
 #init-game .page1 .labels label:first-of-type {
     animation-delay: 50ms;
 }
@@ -147,33 +162,42 @@ body {
     animation-delay: 130ms;
 }
 
-#init-game .page1 .labels label:nth-of-type(3){
+#init-game .page1 .labels label:nth-of-type(3) {
     animation-delay: 200ms;
 }
 
 #init-game .page1 .labels label:last-of-type {
     animation-delay: 350ms;
 }
-@keyframes grow  {
-    to {transform: scale(1)}
+
+@keyframes grow {
+    to {
+        transform: scale(1)
+    }
 }
+
 #init-game .page1 label:hover {
     background: #007aff;
 }
-#init-game .page1 h1, #init-game .page2 h1 {
+
+#init-game .page1 h1,
+#init-game .page2 h1 {
     color: #eee;
     text-align: center;
     font-weight: 100;
     letter-spacing: 1px;
     text-transform: capitalize;
 }
-#init-game .page1 input[type='radio'], #init-game .page2 input[type='radio']{
+
+#init-game .page1 input[type='radio'],
+#init-game .page2 input[type='radio'] {
     transform: scale(0);
 }
 
 #init-game .page2 .labels label {
     border: 1px solid #007aff;
 }
+
 #init-game .page2 .labels label span {
     position: absolute;
     top: 20px;
@@ -184,6 +208,7 @@ body {
     padding: 10px;
     transform: skew(-5deg);
 }
+
 dialog {
     background: linear-gradient(#333, #191919);
     border: 1px solid #333;
@@ -198,8 +223,8 @@ dialog {
     transition: transform 200ms;
     padding: 8px;
     border-radius: 3px;
-
 }
+
 dialog h1 {
     background-color: #ea1d0e;
     margin: -30px auto 30px;
@@ -215,23 +240,28 @@ dialog h1.congrate {
     font-size: 30px;
     background-color: #007aff;
 }
+
 dialog span.congrate {
     font-size: 20px;
 }
+
 dialog p:first-of-type {
-    margin:0;
+    margin: 0;
 }
+
 dialog p:last-of-type {
     text-align: center;
     font-size: 30px;
     margin: -15px 0 10px 0;
     color: #fff
 }
+
 dialog span {
     display: flex;
     justify-content: center;
     color: #ccc;
 }
+
 dialog button {
     display: flex;
     justify-content: center;
@@ -243,20 +273,23 @@ dialog button {
     width: 50%;
     cursor: pointer;
     margin: 10px auto;
-
 }
+
 dialog button svg {
     fill: #999;
     transition: fill 0.2s linear;
     cursor: pointer;
 }
+
 dialog button svg:hover {
     fill: #eee
 }
+
 dialog.dialog-scale {
     visibility: visible;
     transform: scale(1);
 }
+
 dialog::backdrop {
-    background: rgba(255,0,0,.25);
+    background: rgba(255, 0, 0, .25);
 }

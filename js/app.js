@@ -1,33 +1,35 @@
 import {Resources} from './resources';
 
-export  const canvasWidth = 505;
-export  const canvasHeight = 650;
-export  const playerImgWidth = 66;
-export  const playerImgHeight = 89;
-export const bugHeight = 77;
-export const bugWidth = 96;
+export  const CANVAS_WIDTH = 505;
+export  const CANVAS_HEIGHT = 650;
+export  const PLAYER_IMG_WIDTH = 66;
+export  const PLAYER_IMG_HEIGHT = 89;
+export const BUG_HEIGHT = 77;
+export const BUG_WIDTH = 96;
 
-export const defaultPos = {
-    playerX: canvasWidth / 2 - playerImgWidth/2,
-    playerY: canvasHeight - playerImgHeight,
-    bugY: bugHeight,
-    bugX: -bugWidth
+export const DEFAULT_POSITIONS = {
+    playerX: CANVAS_WIDTH / 2 - PLAYER_IMG_WIDTH/2,
+    playerY: CANVAS_HEIGHT - PLAYER_IMG_HEIGHT,
+    bugY: BUG_HEIGHT*1.07,
+    bugX: -BUG_WIDTH
+
 };
 
 
 export class Enemy {
-    constructor(index) {
-        this.x = defaultPos.bugX - Math.random()*bugWidth;
-        this.y = defaultPos.bugY*index*1.07 + 50;
-        this.width = bugWidth;
-        this.height = bugHeight - 10;
+    constructor(index,
+                x = DEFAULT_POSITIONS.bugX - Math.random()*BUG_WIDTH,
+                y = DEFAULT_POSITIONS.bugY*index + 50,
+                width = BUG_WIDTH,
+                height = BUG_HEIGHT - 10) {
+        Object.assign(this, {x, y, width, height});
         this.sprite = 'images/enemy-bug.png';
         this.speed = Math.floor(Math.random()*3)+1;
         this.ctx = document.getElementById('my-canvas').getContext('2d');
     }
 
     update() {
-        this.x += this.speed;
+        this.x += 2;
     }
 
     render() {
@@ -36,19 +38,16 @@ export class Enemy {
     }
 }
 
-export class Player {
-    constructor(sprite= 'images/char-boy.png') {
+export class Player extends Enemy{
+    constructor(sprite= 'images/char-boy.png',
+                x = DEFAULT_POSITIONS.playerX,
+                y = DEFAULT_POSITIONS.playerY,
+                width = PLAYER_IMG_WIDTH,
+                height= PLAYER_IMG_HEIGHT - 13) {
+        super(0, x, y, width, height);
         this.sprite= sprite;
-        this.x = defaultPos.playerX;
-        this.y = defaultPos.playerY;
-        this.width = playerImgWidth;
-        this.height = playerImgHeight - 13;
-        this.ctx = document.getElementById('my-canvas').getContext('2d')
     }
-    render() {
-        this.ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-    }
-    update() {
+    update(){
 
     }
     handleInput(input) {
@@ -56,22 +55,22 @@ export class Player {
         switch (input) {
             case 'up':
                 if (this.y>=0){
-                    this.y -= playerImgHeight / 2;
+                    this.y -= PLAYER_IMG_HEIGHT / 2;
                 }
                 break;
             case 'down':
-                if (this.y < defaultPos.playerY) {
-                    this.y += playerImgHeight / 2;
+                if (this.y < DEFAULT_POSITIONS.playerY) {
+                    this.y += PLAYER_IMG_HEIGHT / 2;
                 }
                 break;
             case 'right':
-                if (this.x<canvasWidth-playerImgWidth) {
-                    this.x += playerImgWidth / 3.3;
+                if (this.x<CANVAS_WIDTH-PLAYER_IMG_WIDTH) {
+                    this.x += PLAYER_IMG_WIDTH ;
                 }
                 break;
             case 'left':
                 if (this.x > 0) {
-                    this.x -= playerImgWidth / 3.3;
+                    this.x -= PLAYER_IMG_WIDTH ;
                 }
                 break;
             default:
