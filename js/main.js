@@ -63,6 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             arcadeEngine.init();
             arcadeEngine.showCanvas();
+
         }
     }, screenTime);
 
@@ -85,7 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             37: 'left',
             39: 'right',
         };
-        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode]);
     });
     document.addEventListener('keyup', function (e) {
         // key up event to make the character move one positions if he had put his finger for a bit of time
@@ -93,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
             38: 'up',
             40: 'down'
         };
-        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode]);
     });
 
 

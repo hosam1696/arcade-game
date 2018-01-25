@@ -60,7 +60,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -173,25 +173,285 @@ module.exports = {
 "use strict";
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__level__ = __webpack_require__(6);
+/* Engine.js
+ * This file provides the game loop functionality (update entities and render),
+ * draws the initial game board on the screen, and then calls the update and
+ * render methods on your player and enemy objects (defined in your app.js).
+ *
+ * A game engine works by drawing the entire game screen over and over, kind of
+ * like a flipbook you may have created as a kid. When your player moves across
+ * the screen, it may look like just that image/character is moving or being
+ * drawn but that is not the case. What's really happening is the entire "scene"
+ * is being drawn over and over, presenting the illusion of animation.
+ *
+ * This engine makes the canvas' context (ctx) object globally available to make
+ * writing app.js a little simpler to work with.
+ */
+
+
+
+
+
+const canvas = document.getElementById('my-canvas'),
+    dialog = document.getElementsByTagName('dialog');
+/* unused harmony export canvas */
+
+/* unused harmony export dialog */
+
+
+class Engine {
+    /* Predefine the variables we'll be using within this scope,
+     * create the canvas element, grab the 2D context for that canvas
+     * set the canvas elements height/width and add it to the DOM.
+     */
+    constructor() {
+        this.player = new __WEBPACK_IMPORTED_MODULE_1__app__["b" /* Player */]();
+        this.allEnemies = [];
+        this.lastTime = 0;
+        this.canvas = document.getElementById('my-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.gamelavel = localStorage.getItem('player:level')
+        this.requestFrame = true;
+        /* Go ahead and load all of the images we know we're going to need to
+          * draw our game level. Then set init as the callback method, so that when
+          * all of these images are properly loaded our game will start.
+        */
+
+    }
+
+    /* This function does some initial setup that should only occur once,
+     * particularly setting the lastTime variable that is required for the
+     * game loop.
+     */
+     init(playerSpirit = localStorage.getItem('player:spirit'), level = this.gamelavel) {
+        // player = new Player();
+        // console.log(playerSpirit, level);
+         this.reset();
+         console.log(this.allEnemies);
+         this.player = new __WEBPACK_IMPORTED_MODULE_1__app__["b" /* Player */](playerSpirit);
+         this.allEnemies = Array.from({length: 6}, (iter, i)=>new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](i));
+         this.lastTime = Date.now();
+         console.log(this.allEnemies);
+
+         this.main.call(this)
+
+
+    }
+
+    main() {
+        /* Get our time delta information which is required if your game
+         * requires smooth animation. Because everyone's computer processes
+         * instructions at different speeds we need a constant value that
+         * would be the same for everyone (regardless of how fast their
+         * computer is) - hurray time!
+         */
+        /*let now = Date.now(),
+            dt = (now - this.lastTime) / 1000.0;
+        */
+        /* Call our update/render functions, pass along the time delta to
+         * our update function since it may be used for smooth animation.
+         */
+        this.update();
+        this.render();
+
+        /* Set our lastTime variable which is used to determine the time delta
+         * for the next time this function is called.
+         */
+        // this.lastTime = now;
+
+        /* Use the browser's requestAnimationFrame function to call this
+         * function again as soon as the browser is able to draw another frame.
+         */
+        this.requestFrame&&window.requestAnimationFrame(this.main.bind(this));
+    }
+
+
+    showCanvas() {
+        let gameinit = document.getElementById('init-game');
+        gameinit.children[0].classList.add('to-bottom');
+        document.getElementById('arcade-game').style.display = 'flex';
+        setTimeout(() => {
+            gameinit.children[0].classList.remove('to-bottom');
+            gameinit.style.display = 'none';
+        }, 250);
+    }
+
+    /* This function is called by main (our game loop) and itself calls all
+     * of the functions which may need to update entity's data. Based on how
+     * you implement your collision detection (when two entities occupy the
+     * same space, for instance when your character should die), you may find
+     * the need to add an additional function call here. For now, we've left
+     * it commented out - you may or may not want to implement this
+     * functionality this way (you could just implement collision detection
+     * on the entities themselves within your app.js file).
+     */
+     update() {
+        this.updateEntities();
+        this.checkCollisions();
+        this.checkPlayerWon()
+    }
+
+    checkCollisions() {
+        this.allEnemies.forEach( (enemy)=> {
+            if (enemy.x < this.player.x + this.player.width &&
+                enemy.x + enemy.width > this.player.x &&
+                enemy.y < this.player.y + this.player.height &&
+                enemy.height + enemy.y > this.player.y) {
+                // collision detected!
+                this.gameEnd(false);
+                console.warn('you lose');
+                this.requestFrame = false;
+            }
+             if (enemy.x +__WEBPACK_IMPORTED_MODULE_1__app__["d" /* bugWidth */] >= this.player.x &&
+                 enemy.x + __WEBPACK_IMPORTED_MODULE_1__app__["d" /* bugWidth */] <= this.player.x + __WEBPACK_IMPORTED_MODULE_1__app__["g" /* playerImgWidth */] &&
+                 enemy.y + __WEBPACK_IMPORTED_MODULE_1__app__["c" /* bugHeight */] - 30 >= this.player.y + 60 &&
+                 enemy.y + __WEBPACK_IMPORTED_MODULE_1__app__["c" /* bugHeight */] - 30 < this.player.y + __WEBPACK_IMPORTED_MODULE_1__app__["c" /* bugHeight */]) {
+
+            }
+        });
+
+    }
+
+    checkPlayerWon() {
+         if (this.player.y <= 0) {
+            this.gameEnd(true)
+         }
+    }
+    /* This is called by the update function and loops through all of the
+     * objects within your allEnemies array as defined in app.js and calls
+     * their update() methods. It will then call the update function for your
+     * player object. These update methods should focus purely on updating
+     * the data/properties related to the object. Do your drawing in your
+     * render methods.
+     */
+     updateEntities() {
+        this.allEnemies.forEach( (enemy, i)=> {
+            enemy.update();
+            if (enemy.x >= __WEBPACK_IMPORTED_MODULE_1__app__["f" /* canvasWidth */] + __WEBPACK_IMPORTED_MODULE_1__app__["g" /* playerImgWidth */]) {
+                this.allEnemies.splice(i, 1);
+                this.allEnemies.splice(i,0,new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](i))
+            }
+        });
+        this.player.update();
+    }
+
+     gameEnd(res) {
+        let dialog = document.getElementById('status-dialog');
+        dialog.show();
+        dialog.classList.add('dialog-scale');
+        dialog.children[0].innerHTML = res ? '<h1 class="congrate">Congratulations</h1><span class="congrate">You passed the Road Safely</span> ' : '<h1>Opps!</h1><span>a BUG! crached you!</span> ';
+        dialog.children[1].addEventListener('click', () => {
+            this.reset(true);
+            this.main();
+            dialog.classList.remove('dialog-scale');
+            // dialog.close('Hey there');
+            // console.log(dialog.returnValue)
+        });
+
+    }
+
+    /* This function initially draws the "game level", it will then call
+     * the renderEntities function. Remember, this function is called every
+     * game tick (or loop of the game engine) because that's how games work -
+     * they are flipbooks creating the illusion of animation but in reality
+     * they are just drawing the entire screen over and over.
+     */
+     render(gameLevel = 1) {
+
+        const level = new __WEBPACK_IMPORTED_MODULE_2__level__["a" /* Level */](gameLevel);
+
+        // Before drawing, clear existing canvas
+        this.ctx.clearRect(0, 0, __WEBPACK_IMPORTED_MODULE_1__app__["f" /* canvasWidth */], __WEBPACK_IMPORTED_MODULE_1__app__["e" /* canvasHeight */]);
+
+        // render the right images of the level
+        level.createLevel(this.ctx, __WEBPACK_IMPORTED_MODULE_0__resources__["Resources"]);
+
+        this.renderEntities();
+    }
+
+    /* This function is called by the render function and is called on each game
+     * tick. Its purpose is to then call the render functions you have defined
+     * on your enemy and player entities within app.js
+     */
+     renderEntities() {
+        /* Loop through all of the objects within the allEnemies array and call
+         * the render function you have defined.
+         */
+        this.allEnemies.forEach(function (enemy) {
+            enemy.render();
+        });
+
+        this.player.render();
+    }
+
+    /* This function does nothing but it could have been a good place to
+     * handle game reset states - maybe a new game menu or a game over screen
+     * those sorts of things. It's only called once by the init() method.
+     */
+     reset(withreinit = false) {
+        // noop
+         this.allEnemies = null;
+
+         if (withreinit) {
+            this.requestFrame = true;
+             this.allEnemies = Array.from({length: 6}, (iter, i)=>new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](i));
+             this.player = new __WEBPACK_IMPORTED_MODULE_1__app__["b" /* Player */](localStorage.getItem('player:spirit'));
+         }
+
+    }
+
+
+}
+/* harmony export (immutable) */ __webpack_exports__["a"] = Engine;
+
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
 
 
 const canvasWidth = 505;
-/* unused harmony export canvasWidth */
+/* harmony export (immutable) */ __webpack_exports__["f"] = canvasWidth;
 
-const canvasHeight = 600;
-/* unused harmony export canvasHeight */
+const canvasHeight = 650;
+/* harmony export (immutable) */ __webpack_exports__["e"] = canvasHeight;
 
-const imgWidth = 101;
-/* harmony export (immutable) */ __webpack_exports__["c"] = imgWidth;
+const playerImgWidth = 66;
+/* harmony export (immutable) */ __webpack_exports__["g"] = playerImgWidth;
 
-const imgHeight = 171;
-/* unused harmony export imgHeight */
+const playerImgHeight = 89;
+/* unused harmony export playerImgHeight */
+
+const bugHeight = 77;
+/* harmony export (immutable) */ __webpack_exports__["c"] = bugHeight;
+
+const bugWidth = 96;
+/* harmony export (immutable) */ __webpack_exports__["d"] = bugWidth;
+
+
+const defaultPos = {
+    playerX: canvasWidth / 2 - playerImgWidth/2,
+    playerY: canvasHeight - playerImgHeight,
+    bugY: bugHeight,
+    bugX: -bugWidth
+};
+/* unused harmony export defaultPos */
+
 
 
 class Enemy {
-    constructor(y) {
-        this.x = -imgWidth;
-        this.y = y ;
+    constructor(index) {
+        this.x = defaultPos.bugX - Math.random()*bugWidth;
+        this.y = defaultPos.bugY*index*1.07 + 50;
+        this.width = bugWidth;
+        this.height = bugHeight - 10;
         this.sprite = 'images/enemy-bug.png';
         this.speed = Math.floor(Math.random()*3)+1;
         this.ctx = document.getElementById('my-canvas').getContext('2d');
@@ -212,8 +472,10 @@ class Enemy {
 class Player {
     constructor(sprite= 'images/char-boy.png') {
         this.sprite= sprite;
-        this.x = canvasWidth / 2 - imgWidth/2;
-        this.y =canvasHeight - imgHeight +20;
+        this.x = defaultPos.playerX;
+        this.y = defaultPos.playerY;
+        this.width = playerImgWidth;
+        this.height = playerImgHeight - 13;
         this.ctx = document.getElementById('my-canvas').getContext('2d')
     }
     render() {
@@ -222,45 +484,27 @@ class Player {
     update() {
 
     }
-    handleInput(input, arcade) {
+    handleInput(input) {
 
         switch (input) {
             case 'up':
-                if (this.y>=-60){
-
-                    this.y -= imgHeight / 3;
-                    this.render();
-                } else {
-                    console.log('you won !');
-                    (function gameEnd(res) {
-                        let dialog = document.getElementById('status-dialog');
-                        dialog.show();
-                        dialog.classList.add('dialog-scale');
-                        dialog.children[0].textContent = res ? 'You won' : 'You lose';
-                        dialog.children[1].addEventListener('click', (ev)=> {
-
-                            dialog.classList.remove('dialog-scale');
-                            arcade.init();
-                        })
-                        })(true)
-                }
-                break;
-            case 'right':
-                if (this.x<416) {
-                    this.x += imgWidth / 3.3;
-                    this.render();
+                if (this.y>=0){
+                    this.y -= playerImgHeight / 2;
                 }
                 break;
             case 'down':
-                if (this.y<460) {
-                    this.y += imgHeight / 3;
-                    this.render();
+                if (this.y < defaultPos.playerY) {
+                    this.y += playerImgHeight / 2;
+                }
+                break;
+            case 'right':
+                if (this.x<canvasWidth-playerImgWidth) {
+                    this.x += playerImgWidth / 3.3;
                 }
                 break;
             case 'left':
                 if (this.x > 0) {
-                    this.x -= imgWidth / 3.3;
-                    this.render();
+                    this.x -= playerImgWidth / 3.3;
                 }
                 break;
             default:
@@ -279,12 +523,12 @@ class Player {
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1__resources__);
 
@@ -352,6 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             arcadeEngine.init();
             arcadeEngine.showCanvas();
+
         }
     }, screenTime);
 
@@ -374,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
             37: 'left',
             39: 'right',
         };
-        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode]);
     });
     document.addEventListener('keyup', function (e) {
         // key up event to make the character move one positions if he had put his finger for a bit of time
@@ -382,270 +627,19 @@ document.addEventListener('DOMContentLoaded', () => {
             38: 'up',
             40: 'down'
         };
-        arcadeEngine.player.handleInput(allowedKeys[e.keyCode], arcadeEngine);
+        arcadeEngine.player.handleInput(allowedKeys[e.keyCode]);
     });
 
 
 });
 
 /***/ }),
-/* 3 */
+/* 4 */,
+/* 5 */,
+/* 6 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(global) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__resources___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__resources__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__app__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__levell__ = __webpack_require__(5);
-/* Engine.js
- * This file provides the game loop functionality (update entities and render),
- * draws the initial game board on the screen, and then calls the update and
- * render methods on your player and enemy objects (defined in your app.js).
- *
- * A game engine works by drawing the entire game screen over and over, kind of
- * like a flipbook you may have created as a kid. When your player moves across
- * the screen, it may look like just that image/character is moving or being
- * drawn but that is not the case. What's really happening is the entire "scene"
- * is being drawn over and over, presenting the illusion of animation.
- *
- * This engine makes the canvas' context (ctx) object globally available to make
- * writing app.js a little simpler to work with.
- */
-
-
-
-
-
-
-const doc = global.document,
-    win = global.window,
-    canvas = document.getElementById('my-canvas'),
-    dialog = document.getElementsByTagName('dialog');
-/* unused harmony export doc */
-
-/* unused harmony export win */
-
-/* unused harmony export canvas */
-
-/* unused harmony export dialog */
-
-const canvasWidth = 505;
-/* unused harmony export canvasWidth */
-
-const imgWidth = 101;
-/* harmony export (immutable) */ __webpack_exports__["c"] = imgWidth;
-
-const imgHeight = 171;
-/* harmony export (immutable) */ __webpack_exports__["b"] = imgHeight;
-
-
-class Engine {
-    /* Predefine the variables we'll be using within this scope,
-     * create the canvas element, grab the 2D context for that canvas
-     * set the canvas elements height/width and add it to the DOM.
-     */
-    constructor() {
-        this.player = new __WEBPACK_IMPORTED_MODULE_1__app__["b" /* Player */]();
-        this.allEnemies = [];
-        this.lastTime = 0;
-        this.canvas = document.getElementById('my-canvas');
-        this.ctx = this.canvas.getContext('2d');
-        this.gamelavel = localStorage.getItem('player:level');
-        /* Go ahead and load all of the images we know we're going to need to
-          * draw our game level. Then set init as the callback method, so that when
-          * all of these images are properly loaded our game will start.
-        */
-
-    }
-
-    /* This function does some initial setup that should only occur once,
-     * particularly setting the lastTime variable that is required for the
-     * game loop.
-     */
-     init(playerSpirit = localStorage.getItem('player:spirit'), level = 1) {
-        // player = new Player();
-        // console.log(playerSpirit);
-         this.reset();
-         this.player = new __WEBPACK_IMPORTED_MODULE_1__app__["b" /* Player */](playerSpirit);
-         this.allEnemies = Array.from({length: 4}, (iter, i)=>new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](__WEBPACK_IMPORTED_MODULE_1__app__["c" /* imgWidth */]*(i*1.6+1)/2));
-         this.lastTime = Date.now();
-         this.main.call(this)
-
-
-    }
-
-    main() {
-        /* Get our time delta information which is required if your game
-         * requires smooth animation. Because everyone's computer processes
-         * instructions at different speeds we need a constant value that
-         * would be the same for everyone (regardless of how fast their
-         * computer is) - hurray time!
-         */
-        /*let now = Date.now(),
-            dt = (now - this.lastTime) / 1000.0;
-        */
-        /* Call our update/render functions, pass along the time delta to
-         * our update function since it may be used for smooth animation.
-         */
-        this.update();
-        this.render();
-
-        /* Set our lastTime variable which is used to determine the time delta
-         * for the next time this function is called.
-         */
-        // this.lastTime = now;
-
-        /* Use the browser's requestAnimationFrame function to call this
-         * function again as soon as the browser is able to draw another frame.
-         */
-        window.requestAnimationFrame(()=>{
-            this.main()
-        });
-    }
-
-
-    showCanvas() {
-        let gameinit = document.getElementById('init-game');
-        gameinit.children[0].classList.add('to-bottom');
-        document.getElementById('arcade-game').style.display = 'flex';
-        setTimeout(() => {
-            gameinit.children[0].classList.remove('to-bottom');
-            gameinit.style.display = 'none';
-        }, 250);
-    }
-
-    /* This function is called by main (our game loop) and itself calls all
-     * of the functions which may need to update entity's data. Based on how
-     * you implement your collision detection (when two entities occupy the
-     * same space, for instance when your character should die), you may find
-     * the need to add an additional function call here. For now, we've left
-     * it commented out - you may or may not want to implement this
-     * functionality this way (you could just implement collision detection
-     * on the entities themselves within your app.js file).
-     */
-     update() {
-        this.updateEntities();
-        // checkCollisions();
-    }
-
-    /* This is called by the update function and loops through all of the
-     * objects within your allEnemies array as defined in app.js and calls
-     * their update() methods. It will then call the update function for your
-     * player object. These update methods should focus purely on updating
-     * the data/properties related to the object. Do your drawing in your
-     * render methods.
-     */
-     updateEntities() {
-        this.allEnemies.forEach( (enemy, i)=> {
-            enemy.update();
-            if (enemy.x >= canvasWidth + imgWidth) {
-                this.allEnemies.splice(i, 1);
-                this.allEnemies.push(new __WEBPACK_IMPORTED_MODULE_1__app__["a" /* Enemy */](__WEBPACK_IMPORTED_MODULE_1__app__["c" /* imgWidth */]*(i*1.6+1)/2))
-            } else if (enemy.x + imgWidth >= this.player.x && enemy.x + imgWidth <= this.player.x + imgWidth && enemy.y + imgHeight - 30 >= this.player.y + 60 && enemy.y + imgHeight - 30 < this.player.y + imgHeight - 30) {
-                this.gameEnd(false);
-                console.warn('you lose')
-            }
-        });
-        this.player.update();
-    }
-
-     gameEnd(res) {
-        let dialog = document.getElementById('status-dialog');
-        dialog.show();
-        dialog.classList.add('dialog-scale');
-        dialog.children[0].innerHTML = res ? '<p>Congratulations</p><span>You passed the Road Safely</span> ' : '<p>Opps</p><span>a BUG! crached you!</span> ';
-        dialog.children[1].addEventListener('click', () => {
-            this.init();
-            dialog.classList.remove('dialog-scale');
-            dialog.close('Hey there');
-            console.log(dialog.returnValue)
-
-        });
-
-    }
-
-    /* This function initially draws the "game level", it will then call
-     * the renderEntities function. Remember, this function is called every
-     * game tick (or loop of the game engine) because that's how games work -
-     * they are flipbooks creating the illusion of animation but in reality
-     * they are just drawing the entire screen over and over.
-     */
-     render(gameLevel = 1) {
-
-        const level = new __WEBPACK_IMPORTED_MODULE_2__levell__["a" /* Level */](gameLevel);
-
-        // Before drawing, clear existing canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // render the right images of the level
-        level.createLevel(this.ctx, __WEBPACK_IMPORTED_MODULE_0__resources__["Resources"]);
-
-        this.renderEntities();
-    }
-
-    /* This function is called by the render function and is called on each game
-     * tick. Its purpose is to then call the render functions you have defined
-     * on your enemy and player entities within app.js
-     */
-     renderEntities() {
-        /* Loop through all of the objects within the allEnemies array and call
-         * the render function you have defined.
-         */
-        this.allEnemies.forEach(function (enemy) {
-            enemy.render();
-        });
-
-        this.player.render();
-    }
-
-    /* This function does nothing but it could have been a good place to
-     * handle game reset states - maybe a new game menu or a game over screen
-     * those sorts of things. It's only called once by the init() method.
-     */
-     reset() {
-        // noop
-    }
-
-
-}
-/* harmony export (immutable) */ __webpack_exports__["a"] = Engine;
-
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(4)))
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__engine__ = __webpack_require__(3);
 
 
 class Level {
@@ -655,6 +649,8 @@ class Level {
     }
 
     createLevel(canavsCtx, resources) {
+        const imgWidth = 101,
+                imgHeight=  171;
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -662,7 +658,8 @@ class Level {
          */
         for (let row = 0; row < this.numRows; row++) {
             for (let col = 0; col < this.numCols; col++) {
-                canavsCtx.drawImage(resources.get(this._rowImages[row]), col * __WEBPACK_IMPORTED_MODULE_0__engine__["c" /* imgWidth */], (row - 1) * __WEBPACK_IMPORTED_MODULE_0__engine__["b" /* imgHeight */] / 2.8);
+
+                canavsCtx.drawImage(resources.get(this._rowImages[row]), col * imgWidth, (row - 1) * imgHeight / 2.8);
             }
         }
     }
@@ -672,6 +669,7 @@ class Level {
             case 1 :
                 return [
                     'images/grass-block.png',
+                    'images/stone-block.png',
                     'images/stone-block.png',
                     'images/stone-block.png',
                     'images/stone-block.png',

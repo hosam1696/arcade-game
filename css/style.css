@@ -30,7 +30,7 @@ body {
  #init-game .page {
      position: absolute;
     width: 505px;
-    height: 600px;
+    height: 650px;
     background: linear-gradient(#333, #191919);
     display: flex;
     flex-direction: column;
@@ -123,11 +123,14 @@ body {
     align-items: center;
 }
 #init-game .page1 .labels label, #init-game .page2 .labels label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: #333;
-    border:1px solid #555;
-    min-width: 200px;
-    width: 200px;
-    height: 200px;
+    border: 1px solid #555;
+    min-width: 180px;
+    width: 180px;
+    height: 180px;
     text-align: center;
     border-radius: 10px;
     transition: background 0.3s ease-in-out;
@@ -185,8 +188,8 @@ dialog {
     background: linear-gradient(#333, #191919);
     border: 1px solid #333;
     box-shadow: 5px 5px 20px;
-    width: 250px;
-    height: 150px;
+    width: 350px;
+    height: 200px;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -195,8 +198,30 @@ dialog {
     transition: transform 200ms;
     padding: 8px;
     border-radius: 3px;
+
 }
-dialog p {
+dialog h1 {
+    background-color: #ea1d0e;
+    margin: -30px auto 30px;
+    transform: skew(10deg);
+    color: #fff;
+    text-align: center;
+    width: 60%;
+    padding: 10px;
+}
+
+dialog h1.congrate {
+    width: 75%;
+    font-size: 30px;
+    background-color: #007aff;
+}
+dialog span.congrate {
+    font-size: 20px;
+}
+dialog p:first-of-type {
+    margin:0;
+}
+dialog p:last-of-type {
     text-align: center;
     font-size: 30px;
     margin: -15px 0 10px 0;
@@ -210,14 +235,23 @@ dialog span {
 dialog button {
     display: flex;
     justify-content: center;
-    background-color: #007aff;
+    background-color: transparent;
     color: #fff;
     padding: 10px;
     border: none;
-    border-radius: 4px;
+    font-size: 20px;
     width: 50%;
     cursor: pointer;
     margin: 10px auto;
+
+}
+dialog button svg {
+    fill: #999;
+    transition: fill 0.2s linear;
+    cursor: pointer;
+}
+dialog button svg:hover {
+    fill: #eee
 }
 dialog.dialog-scale {
     visibility: visible;

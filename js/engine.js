@@ -13,18 +13,12 @@
  * writing app.js a little simpler to work with.
  */
 import {Resources} from './resources';
-import {Player, Enemy} from "./app";
-import * as AppClasses from "./app";
-import {Level} from "./levell";
+import {Player, Enemy, bugHeight, playerImgWidth, canvasWidth, canvasHeight, bugWidth} from "./app";
+import {Level} from "./level";
 
 
-export const doc = global.document,
-    win = global.window,
-    canvas = document.getElementById('my-canvas'),
+export  const canvas = document.getElementById('my-canvas'),
     dialog = document.getElementsByTagName('dialog');
-export  const canvasWidth = 505;
-export  const imgWidth = 101;
-export  const imgHeight = 171;
 
 export  class Engine {
     /* Predefine the variables we'll be using within this scope,
@@ -37,7 +31,8 @@ export  class Engine {
         this.lastTime = 0;
         this.canvas = document.getElementById('my-canvas');
         this.ctx = this.canvas.getContext('2d');
-        this.gamelavel = localStorage.getItem('player:level');
+        this.gamelavel = localStorage.getItem('player:level')
+        this.requestFrame = true;
         /* Go ahead and load all of the images we know we're going to need to
           * draw our game level. Then set init as the callback method, so that when
           * all of these images are properly loaded our game will start.
@@ -49,13 +44,16 @@ export  class Engine {
      * particularly setting the lastTime variable that is required for the
      * game loop.
      */
-     init(playerSpirit = localStorage.getItem('player:spirit'), level = 1) {
+     init(playerSpirit = localStorage.getItem('player:spirit'), level = this.gamelavel) {
         // player = new Player();
-        // console.log(playerSpirit);
+        // console.log(playerSpirit, level);
          this.reset();
+         console.log(this.allEnemies);
          this.player = new Player(playerSpirit);
-         this.allEnemies = Array.from({length: 4}, (iter, i)=>new Enemy(AppClasses.imgWidth*(i*1.6+1)/2));
+         this.allEnemies = Array.from({length: 6}, (iter, i)=>new Enemy(i));
          this.lastTime = Date.now();
+         console.log(this.allEnemies);
+
          this.main.call(this)
 
 
@@ -85,9 +83,7 @@ export  class Engine {
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
          */
-        window.requestAnimationFrame(()=>{
-            this.main()
-        });
+        this.requestFrame&&window.requestAnimationFrame(this.main.bind(this));
     }
 
 
@@ -112,9 +108,36 @@ export  class Engine {
      */
      update() {
         this.updateEntities();
-        // checkCollisions();
+        this.checkCollisions();
+        this.checkPlayerWon()
     }
 
+    checkCollisions() {
+        this.allEnemies.forEach( (enemy)=> {
+            if (enemy.x < this.player.x + this.player.width &&
+                enemy.x + enemy.width > this.player.x &&
+                enemy.y < this.player.y + this.player.height &&
+                enemy.height + enemy.y > this.player.y) {
+                // collision detected!
+                this.gameEnd(false);
+                console.warn('you lose');
+                this.requestFrame = false;
+            }
+             if (enemy.x +bugWidth >= this.player.x &&
+                 enemy.x + bugWidth <= this.player.x + playerImgWidth &&
+                 enemy.y + bugHeight - 30 >= this.player.y + 60 &&
+                 enemy.y + bugHeight - 30 < this.player.y + bugHeight) {
+
+            }
+        });
+
+    }
+
+    checkPlayerWon() {
+         if (this.player.y <= 0) {
+            this.gameEnd(true)
+         }
+    }
     /* This is called by the update function and loops through all of the
      * objects within your allEnemies array as defined in app.js and calls
      * their update() methods. It will then call the update function for your
@@ -125,12 +148,9 @@ export  class Engine {
      updateEntities() {
         this.allEnemies.forEach( (enemy, i)=> {
             enemy.update();
-            if (enemy.x >= canvasWidth + imgWidth) {
+            if (enemy.x >= canvasWidth + playerImgWidth) {
                 this.allEnemies.splice(i, 1);
-                this.allEnemies.push(new Enemy(AppClasses.imgWidth*(i*1.6+1)/2))
-            } else if (enemy.x + imgWidth >= this.player.x && enemy.x + imgWidth <= this.player.x + imgWidth && enemy.y + imgHeight - 30 >= this.player.y + 60 && enemy.y + imgHeight - 30 < this.player.y + imgHeight - 30) {
-                this.gameEnd(false);
-                console.warn('you lose')
+                this.allEnemies.splice(i,0,new Enemy(i))
             }
         });
         this.player.update();
@@ -140,13 +160,13 @@ export  class Engine {
         let dialog = document.getElementById('status-dialog');
         dialog.show();
         dialog.classList.add('dialog-scale');
-        dialog.children[0].innerHTML = res ? '<p>Congratulations</p><span>You passed the Road Safely</span> ' : '<p>Opps</p><span>a BUG! crached you!</span> ';
+        dialog.children[0].innerHTML = res ? '<h1 class="congrate">Congratulations</h1><span class="congrate">You passed the Road Safely</span> ' : '<h1>Opps!</h1><span>a BUG! crached you!</span> ';
         dialog.children[1].addEventListener('click', () => {
-            this.init();
+            this.reset(true);
+            this.main();
             dialog.classList.remove('dialog-scale');
-            dialog.close('Hey there');
-            console.log(dialog.returnValue)
-
+            // dialog.close('Hey there');
+            // console.log(dialog.returnValue)
         });
 
     }
@@ -162,7 +182,7 @@ export  class Engine {
         const level = new Level(gameLevel);
 
         // Before drawing, clear existing canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
         // render the right images of the level
         level.createLevel(this.ctx, Resources);
@@ -189,8 +209,16 @@ export  class Engine {
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
      */
-     reset() {
+     reset(withreinit = false) {
         // noop
+         this.allEnemies = null;
+
+         if (withreinit) {
+            this.requestFrame = true;
+             this.allEnemies = Array.from({length: 6}, (iter, i)=>new Enemy(i));
+             this.player = new Player(localStorage.getItem('player:spirit'));
+         }
+
     }
 
 

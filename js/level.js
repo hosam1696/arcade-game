@@ -1,4 +1,4 @@
-import {imgHeight, imgWidth} from "./engine";
+
 
 export class Level {
     constructor(id = 1) {
@@ -7,6 +7,8 @@ export class Level {
     }
 
     createLevel(canavsCtx, resources) {
+        const imgWidth = 101,
+                imgHeight=  171;
 
         /* Loop through the number of rows and columns we've defined above
          * and, using the rowImages array, draw the correct image for that
@@ -14,6 +16,7 @@ export class Level {
          */
         for (let row = 0; row < this.numRows; row++) {
             for (let col = 0; col < this.numCols; col++) {
+
                 canavsCtx.drawImage(resources.get(this._rowImages[row]), col * imgWidth, (row - 1) * imgHeight / 2.8);
             }
         }
@@ -24,6 +27,7 @@ export class Level {
             case 1 :
                 return [
                     'images/grass-block.png',
+                    'images/stone-block.png',
                     'images/stone-block.png',
                     'images/stone-block.png',
                     'images/stone-block.png',

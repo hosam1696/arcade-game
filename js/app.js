@@ -1,14 +1,26 @@
 import {Resources} from './resources';
 
 export  const canvasWidth = 505;
-export  const canvasHeight = 600;
-export  const imgWidth = 101;
-export  const imgHeight = 171;
+export  const canvasHeight = 650;
+export  const playerImgWidth = 66;
+export  const playerImgHeight = 89;
+export const bugHeight = 77;
+export const bugWidth = 96;
+
+export const defaultPos = {
+    playerX: canvasWidth / 2 - playerImgWidth/2,
+    playerY: canvasHeight - playerImgHeight,
+    bugY: bugHeight,
+    bugX: -bugWidth
+};
+
 
 export class Enemy {
-    constructor(y) {
-        this.x = -imgWidth;
-        this.y = y ;
+    constructor(index) {
+        this.x = defaultPos.bugX - Math.random()*bugWidth;
+        this.y = defaultPos.bugY*index*1.07 + 50;
+        this.width = bugWidth;
+        this.height = bugHeight - 10;
         this.sprite = 'images/enemy-bug.png';
         this.speed = Math.floor(Math.random()*3)+1;
         this.ctx = document.getElementById('my-canvas').getContext('2d');
@@ -27,8 +39,10 @@ export class Enemy {
 export class Player {
     constructor(sprite= 'images/char-boy.png') {
         this.sprite= sprite;
-        this.x = canvasWidth / 2 - imgWidth/2;
-        this.y =canvasHeight - imgHeight +20;
+        this.x = defaultPos.playerX;
+        this.y = defaultPos.playerY;
+        this.width = playerImgWidth;
+        this.height = playerImgHeight - 13;
         this.ctx = document.getElementById('my-canvas').getContext('2d')
     }
     render() {
@@ -37,45 +51,27 @@ export class Player {
     update() {
 
     }
-    handleInput(input, arcade) {
+    handleInput(input) {
 
         switch (input) {
             case 'up':
-                if (this.y>=-60){
-
-                    this.y -= imgHeight / 3;
-                    this.render();
-                } else {
-                    console.log('you won !');
-                    (function gameEnd(res) {
-                        let dialog = document.getElementById('status-dialog');
-                        dialog.show();
-                        dialog.classList.add('dialog-scale');
-                        dialog.children[0].textContent = res ? 'You won' : 'You lose';
-                        dialog.children[1].addEventListener('click', (ev)=> {
-
-                            dialog.classList.remove('dialog-scale');
-                            arcade.init();
-                        })
-                        })(true)
-                }
-                break;
-            case 'right':
-                if (this.x<416) {
-                    this.x += imgWidth / 3.3;
-                    this.render();
+                if (this.y>=0){
+                    this.y -= playerImgHeight / 2;
                 }
                 break;
             case 'down':
-                if (this.y<460) {
-                    this.y += imgHeight / 3;
-                    this.render();
+                if (this.y < defaultPos.playerY) {
+                    this.y += playerImgHeight / 2;
+                }
+                break;
+            case 'right':
+                if (this.x<canvasWidth-playerImgWidth) {
+                    this.x += playerImgWidth / 3.3;
                 }
                 break;
             case 'left':
                 if (this.x > 0) {
-                    this.x -= imgWidth / 3.3;
-                    this.render();
+                    this.x -= playerImgWidth / 3.3;
                 }
                 break;
             default:
